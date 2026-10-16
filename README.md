@@ -1,6 +1,12 @@
-# Handwired Doom for macOS
+# Neural Doom
 
-A local, native AppKit + MetalKit Doom vertical slice. It launches immediately with bundled **Freedoom Phase 1**. DoomGeneric supplies the temporary C game and software renderer; an exact frozen Metal circuit owns the locomotion part of every supported tic command. The long-term replacement contract is in [Docs/architecture.md](Docs/architecture.md), with the machine-readable [coverage ledger](Docs/circuit-coverage.json).
+## What is Neural Doom?
+
+Neural Doom is a native macOS Doom port being rebuilt one subsystem at a time so **deterministic neural circuits** own gameplay and rendering. These are exact, frozen circuit graphs—not a trained probabilistic bot. DoomGeneric currently supplies the unported game engine and software renderer while each replacement is proved against the original behavior.
+
+In the current public milestone, a Metal circuit owns player locomotion on supported tics. The [coverage ledger](Docs/circuit-coverage.json) tracks that boundary as 1 of 10 planned core modules. DoomGeneric leaves the runtime only after every gameplay and rendering module is circuit-owned; the replacement contract is documented in [Docs/architecture.md](Docs/architecture.md).
+
+The app includes bundled **Freedoom Phase 1** for immediate play and a live circuit inspector toggled with **⌘⇧N**.
 
 ## Build and play
 
@@ -32,4 +38,4 @@ The parity executable compares 100,000 seeded in-domain snapshots against **the 
 
 ## Sources
 
-`Sources/DoomCore` contains only the 80 C translation units required by the native application plus upstream headers and GPL license. It is copied from DoomGeneric commit `e257a09527062bfb986b6e5e0780839b6cbd5b71`; only `g_game.c` carries the circuit adapter and test hook. Handwired's execution model at commit `4ea7fcb27ebe93acf49b9f29a93e162b975bad46` informed the small affine/ReGLU/index-read IR. No TypeScript/browser code was embedded; its MIT license is included in `Docs/HANDWIRED-LICENSE.txt`. This repo stays local-only: no remote push, PR, distribution package, or App Store workflow.
+`Sources/DoomCore` contains only the 80 C translation units required by the native application plus upstream headers and GPL license. It is copied from DoomGeneric commit `e257a09527062bfb986b6e5e0780839b6cbd5b71`; only `g_game.c` carries the circuit adapter and test hook. Handwired's execution model at commit `4ea7fcb27ebe93acf49b9f29a93e162b975bad46` informed the small affine/ReGLU/index-read IR. No TypeScript/browser code was embedded; its MIT license is included in `Docs/HANDWIRED-LICENSE.txt`. The canonical public repository is `https://github.com/suvojit-0x55aa/neural-doom`.
