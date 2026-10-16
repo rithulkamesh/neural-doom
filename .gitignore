@@ -1,0 +1,7 @@
+.upstream/
+.local/
+DerivedData/
+*.wad
+*.WAD
+!Assets/freedoom1.wad
+.local-*.log

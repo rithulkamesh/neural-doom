@@ -1,0 +1,1931 @@
+{
+  "abi" : 1,
+  "compiledLiveOperations" : 178,
+  "graphHash" : "05cb2b70f251c2fe",
+  "inputNames" : [
+    "key.strafe",
+    "speed",
+    "key.right",
+    "key.left",
+    "key.up",
+    "key.down",
+    "key.strafeLeft",
+    "key.strafeRight",
+    "mouse.strafe",
+    "mouse.forward",
+    "mouse.backward",
+    "mouse.strafeLeft",
+    "mouse.strafeRight",
+    "mouse.x",
+    "mouse.y",
+    "joy.strafe",
+    "joy.strafeLeft",
+    "joy.strafeRight",
+    "joy.x",
+    "joy.y",
+    "joy.side",
+    "state.turnheld",
+    "ticdup",
+    "reserved"
+  ],
+  "layerCount" : 26,
+  "operationCount" : 178,
+  "operations" : [
+    {
+      "boolean" : false,
+      "id" : 24,
+      "kind" : "affine",
+      "label" : "strafe.active.sum",
+      "layer" : 1,
+      "parents" : [
+        0,
+        8
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 25,
+      "kind" : "affine",
+      "label" : "strafe.active.sum",
+      "layer" : 2,
+      "parents" : [
+        24,
+        15
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 26,
+      "kind" : "affine",
+      "label" : "strafe.active.hi.one",
+      "layer" : 1,
+      "parents" : [
+
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 27,
+      "kind" : "reglu",
+      "label" : "strafe.active.hi",
+      "layer" : 3,
+      "parents" : [
+        25,
+        26
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 28,
+      "kind" : "affine",
+      "label" : "strafe.active.minusOne",
+      "layer" : 3,
+      "parents" : [
+        25
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 29,
+      "kind" : "affine",
+      "label" : "strafe.active.lo.one",
+      "layer" : 1,
+      "parents" : [
+
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 30,
+      "kind" : "reglu",
+      "label" : "strafe.active.lo",
+      "layer" : 4,
+      "parents" : [
+        28,
+        29
+      ]
+    },
+    {
+      "boolean" : true,
+      "id" : 31,
+      "kind" : "affine",
+      "label" : "strafe.active",
+      "layer" : 5,
+      "parents" : [
+        27,
+        30
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 32,
+      "kind" : "affine",
+      "label" : "joy.x.positive.hi.one",
+      "layer" : 1,
+      "parents" : [
+
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 33,
+      "kind" : "reglu",
+      "label" : "joy.x.positive.hi",
+      "layer" : 2,
+      "parents" : [
+        18,
+        32
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 34,
+      "kind" : "affine",
+      "label" : "joy.x.positive.minusOne",
+      "layer" : 1,
+      "parents" : [
+        18
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 35,
+      "kind" : "affine",
+      "label" : "joy.x.positive.lo.one",
+      "layer" : 1,
+      "parents" : [
+
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 36,
+      "kind" : "reglu",
+      "label" : "joy.x.positive.lo",
+      "layer" : 2,
+      "parents" : [
+        34,
+        35
+      ]
+    },
+    {
+      "boolean" : true,
+      "id" : 37,
+      "kind" : "affine",
+      "label" : "joy.x.positive",
+      "layer" : 3,
+      "parents" : [
+        33,
+        36
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 38,
+      "kind" : "affine",
+      "label" : "joy.x.negated",
+      "layer" : 1,
+      "parents" : [
+        18
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 39,
+      "kind" : "affine",
+      "label" : "joy.x.negative.hi.one",
+      "layer" : 1,
+      "parents" : [
+
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 40,
+      "kind" : "reglu",
+      "label" : "joy.x.negative.hi",
+      "layer" : 2,
+      "parents" : [
+        38,
+        39
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 41,
+      "kind" : "affine",
+      "label" : "joy.x.negative.minusOne",
+      "layer" : 2,
+      "parents" : [
+        38
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 42,
+      "kind" : "affine",
+      "label" : "joy.x.negative.lo.one",
+      "layer" : 1,
+      "parents" : [
+
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 43,
+      "kind" : "reglu",
+      "label" : "joy.x.negative.lo",
+      "layer" : 3,
+      "parents" : [
+        41,
+        42
+      ]
+    },
+    {
+      "boolean" : true,
+      "id" : 44,
+      "kind" : "affine",
+      "label" : "joy.x.negative",
+      "layer" : 4,
+      "parents" : [
+        40,
+        43
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 45,
+      "kind" : "affine",
+      "label" : "joy.y.positive.hi.one",
+      "layer" : 1,
+      "parents" : [
+
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 46,
+      "kind" : "reglu",
+      "label" : "joy.y.positive.hi",
+      "layer" : 2,
+      "parents" : [
+        19,
+        45
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 47,
+      "kind" : "affine",
+      "label" : "joy.y.positive.minusOne",
+      "layer" : 1,
+      "parents" : [
+        19
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 48,
+      "kind" : "affine",
+      "label" : "joy.y.positive.lo.one",
+      "layer" : 1,
+      "parents" : [
+
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 49,
+      "kind" : "reglu",
+      "label" : "joy.y.positive.lo",
+      "layer" : 2,
+      "parents" : [
+        47,
+        48
+      ]
+    },
+    {
+      "boolean" : true,
+      "id" : 50,
+      "kind" : "affine",
+      "label" : "joy.y.positive",
+      "layer" : 3,
+      "parents" : [
+        46,
+        49
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 51,
+      "kind" : "affine",
+      "label" : "joy.y.negated",
+      "layer" : 1,
+      "parents" : [
+        19
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 52,
+      "kind" : "affine",
+      "label" : "joy.y.negative.hi.one",
+      "layer" : 1,
+      "parents" : [
+
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 53,
+      "kind" : "reglu",
+      "label" : "joy.y.negative.hi",
+      "layer" : 2,
+      "parents" : [
+        51,
+        52
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 54,
+      "kind" : "affine",
+      "label" : "joy.y.negative.minusOne",
+      "layer" : 2,
+      "parents" : [
+        51
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 55,
+      "kind" : "affine",
+      "label" : "joy.y.negative.lo.one",
+      "layer" : 1,
+      "parents" : [
+
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 56,
+      "kind" : "reglu",
+      "label" : "joy.y.negative.lo",
+      "layer" : 3,
+      "parents" : [
+        54,
+        55
+      ]
+    },
+    {
+      "boolean" : true,
+      "id" : 57,
+      "kind" : "affine",
+      "label" : "joy.y.negative",
+      "layer" : 4,
+      "parents" : [
+        53,
+        56
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 58,
+      "kind" : "affine",
+      "label" : "joy.side.positive.hi.one",
+      "layer" : 1,
+      "parents" : [
+
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 59,
+      "kind" : "reglu",
+      "label" : "joy.side.positive.hi",
+      "layer" : 2,
+      "parents" : [
+        20,
+        58
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 60,
+      "kind" : "affine",
+      "label" : "joy.side.positive.minusOne",
+      "layer" : 1,
+      "parents" : [
+        20
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 61,
+      "kind" : "affine",
+      "label" : "joy.side.positive.lo.one",
+      "layer" : 1,
+      "parents" : [
+
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 62,
+      "kind" : "reglu",
+      "label" : "joy.side.positive.lo",
+      "layer" : 2,
+      "parents" : [
+        60,
+        61
+      ]
+    },
+    {
+      "boolean" : true,
+      "id" : 63,
+      "kind" : "affine",
+      "label" : "joy.side.positive",
+      "layer" : 3,
+      "parents" : [
+        59,
+        62
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 64,
+      "kind" : "affine",
+      "label" : "joy.side.negated",
+      "layer" : 1,
+      "parents" : [
+        20
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 65,
+      "kind" : "affine",
+      "label" : "joy.side.negative.hi.one",
+      "layer" : 1,
+      "parents" : [
+
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 66,
+      "kind" : "reglu",
+      "label" : "joy.side.negative.hi",
+      "layer" : 2,
+      "parents" : [
+        64,
+        65
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 67,
+      "kind" : "affine",
+      "label" : "joy.side.negative.minusOne",
+      "layer" : 2,
+      "parents" : [
+        64
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 68,
+      "kind" : "affine",
+      "label" : "joy.side.negative.lo.one",
+      "layer" : 1,
+      "parents" : [
+
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 69,
+      "kind" : "reglu",
+      "label" : "joy.side.negative.lo",
+      "layer" : 3,
+      "parents" : [
+        67,
+        68
+      ]
+    },
+    {
+      "boolean" : true,
+      "id" : 70,
+      "kind" : "affine",
+      "label" : "joy.side.negative",
+      "layer" : 4,
+      "parents" : [
+        66,
+        69
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 71,
+      "kind" : "affine",
+      "label" : "turn.active.sum",
+      "layer" : 1,
+      "parents" : [
+        2,
+        3
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 72,
+      "kind" : "affine",
+      "label" : "turn.active.sum",
+      "layer" : 4,
+      "parents" : [
+        71,
+        37
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 73,
+      "kind" : "affine",
+      "label" : "turn.active.sum",
+      "layer" : 5,
+      "parents" : [
+        72,
+        44
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 74,
+      "kind" : "affine",
+      "label" : "turn.active.hi.one",
+      "layer" : 1,
+      "parents" : [
+
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 75,
+      "kind" : "reglu",
+      "label" : "turn.active.hi",
+      "layer" : 6,
+      "parents" : [
+        73,
+        74
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 76,
+      "kind" : "affine",
+      "label" : "turn.active.minusOne",
+      "layer" : 6,
+      "parents" : [
+        73
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 77,
+      "kind" : "affine",
+      "label" : "turn.active.lo.one",
+      "layer" : 1,
+      "parents" : [
+
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 78,
+      "kind" : "reglu",
+      "label" : "turn.active.lo",
+      "layer" : 7,
+      "parents" : [
+        76,
+        77
+      ]
+    },
+    {
+      "boolean" : true,
+      "id" : 79,
+      "kind" : "affine",
+      "label" : "turn.active",
+      "layer" : 8,
+      "parents" : [
+        75,
+        78
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 80,
+      "kind" : "affine",
+      "label" : "turnheld.increment",
+      "layer" : 1,
+      "parents" : [
+        21,
+        22
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 81,
+      "kind" : "reglu",
+      "label" : "turnheld.next.positive",
+      "layer" : 9,
+      "parents" : [
+        80,
+        79
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 82,
+      "kind" : "affine",
+      "label" : "turnheld.next.negativeInput",
+      "layer" : 2,
+      "parents" : [
+        80
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 83,
+      "kind" : "reglu",
+      "label" : "turnheld.next.negative",
+      "layer" : 9,
+      "parents" : [
+        82,
+        79
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 84,
+      "kind" : "affine",
+      "label" : "turnheld.next",
+      "layer" : 10,
+      "parents" : [
+        81,
+        83
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 85,
+      "kind" : "affine",
+      "label" : "constant.six",
+      "layer" : 1,
+      "parents" : [
+
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 86,
+      "kind" : "affine",
+      "label" : "turnheld.negative",
+      "layer" : 11,
+      "parents" : [
+        84
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 87,
+      "kind" : "affine",
+      "label" : "slow.threshold",
+      "layer" : 12,
+      "parents" : [
+        85,
+        86
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 88,
+      "kind" : "affine",
+      "label" : "slow.active.hi.one",
+      "layer" : 1,
+      "parents" : [
+
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 89,
+      "kind" : "reglu",
+      "label" : "slow.active.hi",
+      "layer" : 13,
+      "parents" : [
+        87,
+        88
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 90,
+      "kind" : "affine",
+      "label" : "slow.active.minusOne",
+      "layer" : 13,
+      "parents" : [
+        87
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 91,
+      "kind" : "affine",
+      "label" : "slow.active.lo.one",
+      "layer" : 1,
+      "parents" : [
+
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 92,
+      "kind" : "reglu",
+      "label" : "slow.active.lo",
+      "layer" : 14,
+      "parents" : [
+        90,
+        91
+      ]
+    },
+    {
+      "boolean" : true,
+      "id" : 93,
+      "kind" : "affine",
+      "label" : "slow.active",
+      "layer" : 15,
+      "parents" : [
+        89,
+        92
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 94,
+      "kind" : "affine",
+      "label" : "constant.two",
+      "layer" : 1,
+      "parents" : [
+
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 95,
+      "kind" : "reglu",
+      "label" : "slow.index.positive",
+      "layer" : 16,
+      "parents" : [
+        94,
+        93
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 96,
+      "kind" : "affine",
+      "label" : "slow.index.negativeInput",
+      "layer" : 2,
+      "parents" : [
+        94
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 97,
+      "kind" : "reglu",
+      "label" : "slow.index.negative",
+      "layer" : 16,
+      "parents" : [
+        96,
+        93
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 98,
+      "kind" : "affine",
+      "label" : "slow.index",
+      "layer" : 17,
+      "parents" : [
+        95,
+        97
+      ]
+    },
+    {
+      "boolean" : true,
+      "id" : 99,
+      "kind" : "affine",
+      "label" : "fast.active",
+      "layer" : 16,
+      "parents" : [
+        93
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 100,
+      "kind" : "reglu",
+      "label" : "fast.index.positive",
+      "layer" : 17,
+      "parents" : [
+        1,
+        99
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 101,
+      "kind" : "affine",
+      "label" : "fast.index.negativeInput",
+      "layer" : 1,
+      "parents" : [
+        1
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 102,
+      "kind" : "reglu",
+      "label" : "fast.index.negative",
+      "layer" : 17,
+      "parents" : [
+        101,
+        99
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 103,
+      "kind" : "affine",
+      "label" : "fast.index",
+      "layer" : 18,
+      "parents" : [
+        100,
+        102
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 104,
+      "kind" : "affine",
+      "label" : "turn.speedIndex",
+      "layer" : 19,
+      "parents" : [
+        98,
+        103
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 105,
+      "kind" : "index",
+      "label" : "forward.speed",
+      "layer" : 1,
+      "parents" : [
+        1
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 106,
+      "kind" : "index",
+      "label" : "side.speed",
+      "layer" : 1,
+      "parents" : [
+        1
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 107,
+      "kind" : "index",
+      "label" : "angle.speed",
+      "layer" : 20,
+      "parents" : [
+        104
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 108,
+      "kind" : "affine",
+      "label" : "right.turnSign",
+      "layer" : 1,
+      "parents" : [
+        2
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 109,
+      "kind" : "affine",
+      "label" : "joyRight.turnSign",
+      "layer" : 4,
+      "parents" : [
+        37
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 110,
+      "kind" : "affine",
+      "label" : "turn.direction.sum",
+      "layer" : 5,
+      "parents" : [
+        3,
+        44
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 111,
+      "kind" : "affine",
+      "label" : "turn.direction.sum",
+      "layer" : 6,
+      "parents" : [
+        110,
+        108
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 112,
+      "kind" : "affine",
+      "label" : "turn.direction.sum",
+      "layer" : 7,
+      "parents" : [
+        111,
+        109
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 113,
+      "kind" : "reglu",
+      "label" : "angle.keyboard.positive",
+      "layer" : 21,
+      "parents" : [
+        112,
+        107
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 114,
+      "kind" : "affine",
+      "label" : "angle.keyboard.negativeInput",
+      "layer" : 8,
+      "parents" : [
+        112
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 115,
+      "kind" : "reglu",
+      "label" : "angle.keyboard.negative",
+      "layer" : 21,
+      "parents" : [
+        114,
+        107
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 116,
+      "kind" : "affine",
+      "label" : "angle.keyboard",
+      "layer" : 22,
+      "parents" : [
+        113,
+        115
+      ]
+    },
+    {
+      "boolean" : true,
+      "id" : 117,
+      "kind" : "affine",
+      "label" : "turn.mode",
+      "layer" : 6,
+      "parents" : [
+        31
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 118,
+      "kind" : "reglu",
+      "label" : "angle.nonStrafe.positive",
+      "layer" : 23,
+      "parents" : [
+        116,
+        117
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 119,
+      "kind" : "affine",
+      "label" : "angle.nonStrafe.negativeInput",
+      "layer" : 23,
+      "parents" : [
+        116
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 120,
+      "kind" : "reglu",
+      "label" : "angle.nonStrafe.negative",
+      "layer" : 24,
+      "parents" : [
+        119,
+        117
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 121,
+      "kind" : "affine",
+      "label" : "angle.nonStrafe",
+      "layer" : 25,
+      "parents" : [
+        118,
+        120
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 122,
+      "kind" : "affine",
+      "label" : "strafe.turnDirection",
+      "layer" : 8,
+      "parents" : [
+        112
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 123,
+      "kind" : "reglu",
+      "label" : "side.turn.positive",
+      "layer" : 9,
+      "parents" : [
+        122,
+        106
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 124,
+      "kind" : "affine",
+      "label" : "side.turn.negativeInput",
+      "layer" : 9,
+      "parents" : [
+        122
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 125,
+      "kind" : "reglu",
+      "label" : "side.turn.negative",
+      "layer" : 10,
+      "parents" : [
+        124,
+        106
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 126,
+      "kind" : "affine",
+      "label" : "side.turn",
+      "layer" : 11,
+      "parents" : [
+        123,
+        125
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 127,
+      "kind" : "reglu",
+      "label" : "side.strafeTurn.positive",
+      "layer" : 12,
+      "parents" : [
+        126,
+        31
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 128,
+      "kind" : "affine",
+      "label" : "side.strafeTurn.negativeInput",
+      "layer" : 12,
+      "parents" : [
+        126
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 129,
+      "kind" : "reglu",
+      "label" : "side.strafeTurn.negative",
+      "layer" : 13,
+      "parents" : [
+        128,
+        31
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 130,
+      "kind" : "affine",
+      "label" : "side.strafeTurn",
+      "layer" : 14,
+      "parents" : [
+        127,
+        129
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 131,
+      "kind" : "affine",
+      "label" : "down.sign",
+      "layer" : 1,
+      "parents" : [
+        5
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 132,
+      "kind" : "affine",
+      "label" : "joyDown.sign",
+      "layer" : 4,
+      "parents" : [
+        50
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 133,
+      "kind" : "affine",
+      "label" : "mouseBack.sign",
+      "layer" : 1,
+      "parents" : [
+        10
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 134,
+      "kind" : "affine",
+      "label" : "forward.direction.sum",
+      "layer" : 5,
+      "parents" : [
+        4,
+        57
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 135,
+      "kind" : "affine",
+      "label" : "forward.direction.sum",
+      "layer" : 6,
+      "parents" : [
+        134,
+        9
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 136,
+      "kind" : "affine",
+      "label" : "forward.direction.sum",
+      "layer" : 7,
+      "parents" : [
+        135,
+        131
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 137,
+      "kind" : "affine",
+      "label" : "forward.direction.sum",
+      "layer" : 8,
+      "parents" : [
+        136,
+        132
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 138,
+      "kind" : "affine",
+      "label" : "forward.direction.sum",
+      "layer" : 9,
+      "parents" : [
+        137,
+        133
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 139,
+      "kind" : "reglu",
+      "label" : "forward.base.positive",
+      "layer" : 10,
+      "parents" : [
+        138,
+        105
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 140,
+      "kind" : "affine",
+      "label" : "forward.base.negativeInput",
+      "layer" : 10,
+      "parents" : [
+        138
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 141,
+      "kind" : "reglu",
+      "label" : "forward.base.negative",
+      "layer" : 11,
+      "parents" : [
+        140,
+        105
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 142,
+      "kind" : "affine",
+      "label" : "forward.base",
+      "layer" : 12,
+      "parents" : [
+        139,
+        141
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 143,
+      "kind" : "affine",
+      "label" : "strafe.left.sum",
+      "layer" : 1,
+      "parents" : [
+        6,
+        11
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 144,
+      "kind" : "affine",
+      "label" : "strafe.left.sum",
+      "layer" : 2,
+      "parents" : [
+        143,
+        16
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 145,
+      "kind" : "affine",
+      "label" : "strafe.left.sum",
+      "layer" : 5,
+      "parents" : [
+        144,
+        70
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 146,
+      "kind" : "affine",
+      "label" : "strafe.left.hi.one",
+      "layer" : 1,
+      "parents" : [
+
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 147,
+      "kind" : "reglu",
+      "label" : "strafe.left.hi",
+      "layer" : 6,
+      "parents" : [
+        145,
+        146
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 148,
+      "kind" : "affine",
+      "label" : "strafe.left.minusOne",
+      "layer" : 6,
+      "parents" : [
+        145
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 149,
+      "kind" : "affine",
+      "label" : "strafe.left.lo.one",
+      "layer" : 1,
+      "parents" : [
+
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 150,
+      "kind" : "reglu",
+      "label" : "strafe.left.lo",
+      "layer" : 7,
+      "parents" : [
+        148,
+        149
+      ]
+    },
+    {
+      "boolean" : true,
+      "id" : 151,
+      "kind" : "affine",
+      "label" : "strafe.left",
+      "layer" : 8,
+      "parents" : [
+        147,
+        150
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 152,
+      "kind" : "affine",
+      "label" : "strafe.right.sum",
+      "layer" : 1,
+      "parents" : [
+        7,
+        12
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 153,
+      "kind" : "affine",
+      "label" : "strafe.right.sum",
+      "layer" : 2,
+      "parents" : [
+        152,
+        17
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 154,
+      "kind" : "affine",
+      "label" : "strafe.right.sum",
+      "layer" : 4,
+      "parents" : [
+        153,
+        63
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 155,
+      "kind" : "affine",
+      "label" : "strafe.right.hi.one",
+      "layer" : 1,
+      "parents" : [
+
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 156,
+      "kind" : "reglu",
+      "label" : "strafe.right.hi",
+      "layer" : 5,
+      "parents" : [
+        154,
+        155
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 157,
+      "kind" : "affine",
+      "label" : "strafe.right.minusOne",
+      "layer" : 5,
+      "parents" : [
+        154
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 158,
+      "kind" : "affine",
+      "label" : "strafe.right.lo.one",
+      "layer" : 1,
+      "parents" : [
+
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 159,
+      "kind" : "reglu",
+      "label" : "strafe.right.lo",
+      "layer" : 6,
+      "parents" : [
+        157,
+        158
+      ]
+    },
+    {
+      "boolean" : true,
+      "id" : 160,
+      "kind" : "affine",
+      "label" : "strafe.right",
+      "layer" : 7,
+      "parents" : [
+        156,
+        159
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 161,
+      "kind" : "affine",
+      "label" : "strafeLeft.sign",
+      "layer" : 9,
+      "parents" : [
+        151
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 162,
+      "kind" : "affine",
+      "label" : "side.direction",
+      "layer" : 10,
+      "parents" : [
+        160,
+        161
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 163,
+      "kind" : "reglu",
+      "label" : "side.base.positive",
+      "layer" : 11,
+      "parents" : [
+        162,
+        106
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 164,
+      "kind" : "affine",
+      "label" : "side.base.negativeInput",
+      "layer" : 11,
+      "parents" : [
+        162
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 165,
+      "kind" : "reglu",
+      "label" : "side.base.negative",
+      "layer" : 12,
+      "parents" : [
+        164,
+        106
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 166,
+      "kind" : "affine",
+      "label" : "side.base",
+      "layer" : 13,
+      "parents" : [
+        163,
+        165
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 167,
+      "kind" : "affine",
+      "label" : "forward.mouse",
+      "layer" : 13,
+      "parents" : [
+        142,
+        14
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 168,
+      "kind" : "affine",
+      "label" : "mouse.sideScale",
+      "layer" : 1,
+      "parents" : [
+        13
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 169,
+      "kind" : "reglu",
+      "label" : "mouse.side.positive",
+      "layer" : 6,
+      "parents" : [
+        168,
+        31
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 170,
+      "kind" : "affine",
+      "label" : "mouse.side.negativeInput",
+      "layer" : 2,
+      "parents" : [
+        168
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 171,
+      "kind" : "reglu",
+      "label" : "mouse.side.negative",
+      "layer" : 6,
+      "parents" : [
+        170,
+        31
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 172,
+      "kind" : "affine",
+      "label" : "mouse.side",
+      "layer" : 7,
+      "parents" : [
+        169,
+        171
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 173,
+      "kind" : "affine",
+      "label" : "side.raw.sum",
+      "layer" : 15,
+      "parents" : [
+        130,
+        166
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 174,
+      "kind" : "affine",
+      "label" : "side.raw.sum",
+      "layer" : 16,
+      "parents" : [
+        173,
+        172
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 175,
+      "kind" : "affine",
+      "label" : "mouse.angleScale",
+      "layer" : 1,
+      "parents" : [
+        13
+      ]
+    },
+    {
+      "boolean" : true,
+      "id" : 176,
+      "kind" : "affine",
+      "label" : "mouse.turnMode",
+      "layer" : 6,
+      "parents" : [
+        31
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 177,
+      "kind" : "reglu",
+      "label" : "mouse.angle.positive",
+      "layer" : 7,
+      "parents" : [
+        175,
+        176
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 178,
+      "kind" : "affine",
+      "label" : "mouse.angle.negativeInput",
+      "layer" : 2,
+      "parents" : [
+        175
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 179,
+      "kind" : "reglu",
+      "label" : "mouse.angle.negative",
+      "layer" : 7,
+      "parents" : [
+        178,
+        176
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 180,
+      "kind" : "affine",
+      "label" : "mouse.angle",
+      "layer" : 8,
+      "parents" : [
+        177,
+        179
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 181,
+      "kind" : "affine",
+      "label" : "angle.raw",
+      "layer" : 26,
+      "parents" : [
+        121,
+        180
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 182,
+      "kind" : "affine",
+      "label" : "forward.above50",
+      "layer" : 14,
+      "parents" : [
+        167
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 183,
+      "kind" : "affine",
+      "label" : "forward.high.one",
+      "layer" : 1,
+      "parents" : [
+
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 184,
+      "kind" : "reglu",
+      "label" : "forward.high",
+      "layer" : 15,
+      "parents" : [
+        182,
+        183
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 185,
+      "kind" : "affine",
+      "label" : "forward.plus50",
+      "layer" : 14,
+      "parents" : [
+        167
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 186,
+      "kind" : "affine",
+      "label" : "forward.belowMinus50",
+      "layer" : 15,
+      "parents" : [
+        185
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 187,
+      "kind" : "affine",
+      "label" : "forward.low.one",
+      "layer" : 1,
+      "parents" : [
+
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 188,
+      "kind" : "reglu",
+      "label" : "forward.low",
+      "layer" : 16,
+      "parents" : [
+        186,
+        187
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 189,
+      "kind" : "affine",
+      "label" : "forward.highSubtract",
+      "layer" : 16,
+      "parents" : [
+        184
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 190,
+      "kind" : "affine",
+      "label" : "forward.clamped.sum",
+      "layer" : 17,
+      "parents" : [
+        167,
+        189
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 191,
+      "kind" : "affine",
+      "label" : "forward.clamped.sum",
+      "layer" : 18,
+      "parents" : [
+        190,
+        188
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 192,
+      "kind" : "affine",
+      "label" : "side.above50",
+      "layer" : 17,
+      "parents" : [
+        174
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 193,
+      "kind" : "affine",
+      "label" : "side.high.one",
+      "layer" : 1,
+      "parents" : [
+
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 194,
+      "kind" : "reglu",
+      "label" : "side.high",
+      "layer" : 18,
+      "parents" : [
+        192,
+        193
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 195,
+      "kind" : "affine",
+      "label" : "side.plus50",
+      "layer" : 17,
+      "parents" : [
+        174
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 196,
+      "kind" : "affine",
+      "label" : "side.belowMinus50",
+      "layer" : 18,
+      "parents" : [
+        195
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 197,
+      "kind" : "affine",
+      "label" : "side.low.one",
+      "layer" : 1,
+      "parents" : [
+
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 198,
+      "kind" : "reglu",
+      "label" : "side.low",
+      "layer" : 19,
+      "parents" : [
+        196,
+        197
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 199,
+      "kind" : "affine",
+      "label" : "side.highSubtract",
+      "layer" : 19,
+      "parents" : [
+        194
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 200,
+      "kind" : "affine",
+      "label" : "side.clamped.sum",
+      "layer" : 20,
+      "parents" : [
+        174,
+        199
+      ]
+    },
+    {
+      "boolean" : false,
+      "id" : 201,
+      "kind" : "affine",
+      "label" : "side.clamped.sum",
+      "layer" : 21,
+      "parents" : [
+        200,
+        198
+      ]
+    }
+  ],
+  "roots" : [
+    191,
+    201,
+    181,
+    84
+  ],
+  "tables" : [
+    25,
+    50,
+    24,
+    40,
+    640,
+    1280,
+    320
+  ]
+}

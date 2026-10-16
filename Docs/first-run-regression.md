@@ -1,0 +1,7 @@
+# First-run prompt regression
+
+**Trigger reproduced before the correction:** launching the earlier app without `FREEDOOM_IWAD` or `--iwad` constructed the startup overlay with “Choose a local IWAD to play” and a **Choose IWAD…** button. The process had a native window but never called `HM_EngineStart`; no game tic could occur until a file was picked. Desktop capture was unavailable in this session (`screencapture: could not create image from display`), so the symptom is established by the then-current `Main.swift` branch and no-IWAD launch process, not a screenshot.
+
+**Counterfactual path now implemented:** the app target copies the official Freedoom 0.13.0 Phase 1 IWAD, license, and credits into `Contents/Resources`. `Bundle.main` resolves `freedoom1.wad` on clean launch, `IWADValidator` checks the header and directory bounds, and the engine starts immediately. The overlay is a loading/error state; **File → Open IWAD…** is an advanced override and relaunches with a user-selected IWAD. Proprietary id Software WADs are never bundled.
+
+`CircuitTests --app-bundle <copied app>` checks resource resolution outside the source tree, header/directory readability, the pinned SHA-256, and license/credits. A clean copied `.app` was also launched with no IWAD environment variables, no CLI arguments, and no picker; its log loaded `Contents/Resources/freedoom1.wad`, identified Freedoom Phase 1, initialized graphics, and sampled the active engine queue and MTKView draw path. See `Docs/validation.md` for repeatable commands and run evidence.
