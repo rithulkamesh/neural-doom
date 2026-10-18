@@ -148,6 +148,18 @@ private func capacityTests() {
             checked += 1
         }
     }
+    // An empty column is only its terminator: 7 header + 1 column start + 1 terminator = 9 cells.
+    var empty = MicroWAD.make(withBSP: false)
+    empty.set("PATCH1", le16(1) + le16(1) + le16(0) + le16(0) + le32(12) + [0xFF])
+    let emptyWAD = empty.data()
+    switch decode(emptyWAD, limits: [UInt32(HM_TABLE_PATCH_COLUMNS): 8]) {
+    case .failure(.capacityExceeded(let name, _, 8)): require(name == "patch-columns", "empty-column capacity report")
+    default: require(false, "empty-column terminator exceeded capacity 8 without rejection")
+    }
+    if case .success(let t) = decode(emptyWAD, limits: [UInt32(HM_TABLE_PATCH_COLUMNS): 9]) {
+        require(tableCells(t, HM_TABLE_PATCH_COLUMNS) == [1, 1, 1, 1, 0, 0, 7, 8, -1], "empty-column table at capacity 9")
+        checked += 1
+    } else { require(false, "empty-column patch at capacity 9 must load") }
     print("map tables: \(checked) exact-capacity loads and capacity+1 rejections, no partial publication")
 }
 
@@ -203,6 +215,7 @@ private func adversarialTests() {
     run("subsector range") { $0.lumps[$0.index("SSECTORS")].bytes[2] = 5 }
     run("subsector empty") { $0.lumps[$0.index("SSECTORS")].bytes[0] = 0 }
     run("node child node") { $0.lumps[$0.index("NODES")].bytes[24] = 7; $0.lumps[$0.index("NODES")].bytes[25] = 0 }
+    run("cyclic BSP") { $0.lumps[$0.index("NODES")].bytes[24] = 0; $0.lumps[$0.index("NODES")].bytes[25] = 0 }
     run("node child subsector") { $0.lumps[$0.index("NODES")].bytes[24] = 9 }
     run("zero nodes, two subsectors") { $0.set("NODES", []) }
     // Blockmap and reject.
@@ -227,6 +240,9 @@ private func adversarialTests() {
     run("texture zero width") { $0.lumps[$0.index("TEXTURE1")].bytes[12 + 12] = 0 }
     run("patch truncated") { $0.lumps[$0.index("PATCH1")].bytes.removeLast(9) }
     run("patch column offset") { $0.lumps[$0.index("PATCH1")].bytes[8] = 99 }
+    run("patch negative width") { $0.lumps[$0.index("PATCH1")].bytes[0] = 0xFF; $0.lumps[$0.index("PATCH1")].bytes[1] = 0xFF }
+    run("patch zero height") { $0.lumps[$0.index("PATCH1")].bytes[2] = 0; $0.lumps[$0.index("PATCH1")].bytes[3] = 0 }
+    run("patch negative height") { $0.lumps[$0.index("PATCH1")].bytes[2] = 0xFF; $0.lumps[$0.index("PATCH1")].bytes[3] = 0xFF }
     run("patch tiny") { $0.set("PATCH1", [1, 0]) }
     run("sidedef missing texture") { $0.lumps[$0.index("SIDEDEFS")].bytes[4] = 0x51 }
     run("sector flat outside F_START..F_END") { $0.lumps[$0.index("SECTORS")].bytes[4] = 0x51 }
@@ -237,6 +253,11 @@ private func adversarialTests() {
     run("lump order") { $0.lumps[$0.index("SIDEDEFS")].name = "LINEDEFS"; $0.lumps[$0.index("LINEDEFS")].name = "SIDEDEFS" }
     run("truncated map sequence") { $0.lumps.removeLast() }
     run("Hexen BEHAVIOR", .unsupported) { $0.lumps.append(("BEHAVIOR", [0])) }
+    // UDMF is valid but unsupported, so the app may fall back instead of refusing it.
+    let udmf = MicroWAD(lumps: [("MAP01", []), ("TEXTMAP", []), ("ENDMAP", [])]).data()
+    if case .failure(.unsupported) = (Result { try MapTablesV1.decode(wad: udmf, map: "MAP01") })
+        .mapError({ $0 as! MapTablesFailure }) { corpus += 1 }
+    else { require(false, "UDMF map was not classified unsupported") }
     for name in ["XYZ", "E1M", "MAP1", "E1M1X"] {
         do { _ = try MapTablesV1.decode(wad: good.data(), map: name); require(false, "map name \(name) accepted") }
         catch is MapTablesFailure { corpus += 1 } catch { require(false, "unexpected error") }

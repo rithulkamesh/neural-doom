@@ -178,6 +178,10 @@ private struct MapDecoder {
         let isMAP = c.count == 5 && map.hasPrefix("MAP") && digit(c[3]) && digit(c[4])
         guard isEpisode || isMAP else { throw fail("\(map) is not an ExMy or MAPxx map name") }
         guard let marker = find(map) else { throw fail("map marker \(map) not found") }
+        // UDMF is a valid format this version does not decode: unsupported, not malformed.
+        if marker + 1 < lumps.count, lumps[marker + 1].name == "TEXTMAP" {
+            throw MapTablesFailure.unsupported("UDMF map \(map) (TEXTMAP lump)")
+        }
         let order = ["THINGS", "LINEDEFS", "SIDEDEFS", "VERTEXES", "SEGS", "SSECTORS", "NODES",
                      "SECTORS", "REJECT", "BLOCKMAP"]
         guard marker + order.count < lumps.count else { throw fail("map \(map) lump sequence is truncated") }
@@ -323,6 +327,20 @@ private struct MapDecoder {
                 nodes.append(Int32(child))
             }
         }
+        // Every graph reachable from the root (the last node) must terminate.
+        if nn > 0 {
+            var color = [UInt8](repeating: 0, count: nn)   // 0 white, 1 gray, 2 black
+            var stack: [(node: Int, next: Int)] = [(nn - 1, 0)]
+            color[nn - 1] = 1
+            while let top = stack.last {
+                if top.next == 2 { color[top.node] = 2; stack.removeLast(); continue }
+                stack[stack.count - 1].next += 1
+                let child = Int(nodes[top.node * 14 + 12 + top.next])
+                guard child & 0x8000 == 0 else { continue }
+                guard color[child] != 1 else { throw fail("BSP node \(top.node) reaches itself through node \(child)") }
+                if color[child] == 0 { color[child] = 1; stack.append((child, 0)) }
+            }
+        }
         out[HM_TABLE_NODES] = nodes
 
         // ---- things
@@ -447,9 +465,10 @@ private struct MapDecoder {
             let lump = lumps[patchLump[idx]!]
             let b = lump.pos
             guard lump.size >= 8 else { throw fail("patch \(idx) is shorter than its header") }
-            let w = Int(u16(data, b)), h = Int(u16(data, b + 2))
+            let w = i16(data, b), h = i16(data, b + 2)   // signed, as Doom's SHORT()
+            guard w > 0, h > 0 else { throw fail("patch \(idx) has non-positive size \(w)x\(h)") }
             let tableEnd = 8 + 4 * w
-            guard w > 0, tableEnd <= lump.size else { throw fail("patch \(idx) column table exceeds its lump") }
+            guard tableEnd <= lump.size else { throw fail("patch \(idx) column table exceeds its lump") }
             let at = 1 + idx * 6
             cols[at] = 1; cols[at + 1] = Int32(w); cols[at + 2] = Int32(h)
             cols[at + 3] = Int32(i16(data, b + 4)); cols[at + 4] = Int32(i16(data, b + 6))
@@ -471,10 +490,11 @@ private struct MapDecoder {
                     guard p + 3 <= lump.size else { throw fail("patch \(idx) column \(c) post header is truncated") }
                     let len = Int(data[b + p + 1])
                     guard p + 4 + len <= lump.size else { throw fail("patch \(idx) column \(c) post exceeds its lump") }
-                    try grow(HM_TABLE_PATCH_COLUMNS, cols, adding: 2 + (len + 3) / 4 + 1)
+                    try grow(HM_TABLE_PATCH_COLUMNS, cols, adding: 2 + (len + 3) / 4)
                     cols += [Int32(top), Int32(len)] + pack(data[b + p + 3 ..< b + p + 3 + len])
                     p += len + 4
                 }
+                try grow(HM_TABLE_PATCH_COLUMNS, cols, adding: 1)
                 cols.append(-1)
             }
         }
