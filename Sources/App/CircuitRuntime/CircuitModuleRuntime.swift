@@ -255,10 +255,12 @@ final class CircuitModuleRuntime {
             slot.complete(module.evaluate(inv))
         }
         // Poll only within the short budget; timed semaphore wakeups overshoot under GPU load.
+        // Yield between polls: concurrent waiters on a few cores must not starve the workers they wait for.
         var staged: StagedResult?
         while true {
             if slot.done.wait(timeout: .now()) == .success { staged = slot.take(); break }
             if DispatchTime.now().uptimeNanoseconds - start >= deadlineNs { staged = slot.take(); break }
+            sched_yield()
         }
         let wait = slot.lastWorkerStartNs > enqueued ? slot.lastWorkerStartNs - enqueued : 0
         let elapsed = DispatchTime.now().uptimeNanoseconds - start

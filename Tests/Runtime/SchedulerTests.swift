@@ -161,7 +161,7 @@ func runSchedulerTests() {
     do {
         let mods = (0..<4).map { FakeModule(id: UInt32(HM_MODULE_MOVEMENT_COLLISION) + UInt32($0) * 0x10000, phase: 2, deadlineNs: 1_000_000_000) }
         let log = CommitLog()
-        mods.forEach { $0.delayNs = 60_000_000 }
+        mods.forEach { $0.delayNs = 150_000_000 }
         let scheduler = CircuitScheduler(modules: mods, budget: TicBudget(totalNs: 2_000_000_000), sink: log.sink)
         scheduler.runTic(ticID: 1, invocation: { _ in invocation(1) })
         // Structural, not wall-clock: every module started before any module finished.
