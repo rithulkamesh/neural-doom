@@ -235,42 +235,72 @@ final class CircuitModuleRuntime {
         return nil
     }
 
-    func run(_ inv: ModuleInvocation, deadlineNs: UInt64, budgetLimited: Bool = false) -> ModuleOutcome {
+    /// One in-flight attempt. `begin` starts it; `poll` resolves it without blocking.
+    struct Pending {
+        fileprivate var inv: ModuleInvocation
+        fileprivate var reference: StagedResult
+        fileprivate var start: UInt64
+        fileprivate var enqueued: UInt64
+        fileprivate var deadlineNs: UInt64
+        fileprivate var slot: ModuleSlot?
+        fileprivate var immediate: UInt32?     // fallback decided before any dispatch
+    }
+
+    func begin(_ inv: ModuleInvocation, deadlineNs: UInt64, budgetLimited: Bool = false) -> Pending {
         let start = DispatchTime.now().uptimeNanoseconds
         let reference = module.reference(inv)
         telemetry.recordHighWater(inputs: inv.inputs.count, outputs: reference.outputs.count,
                                   deltas: reference.deltas.count, events: reference.events.count)
-        func fallback(_ code: UInt32, queueWait: UInt64 = 0) -> ModuleOutcome {
-            let ns = DispatchTime.now().uptimeNanoseconds - start
-            telemetry.recordFallback(code, attemptNs: ns)
-            return ModuleOutcome(committed: reference, accepted: false, code: code, attemptNs: ns, queueWaitNs: queueWait)
-        }
-        if let code = gate(inv) { return fallback(code) }
-        if deadlineNs == 0 { return fallback(budgetLimited ? FallbackCode.budget : FallbackCode.deadline) }
-        guard let slot = slots.first(where: { $0.acquire() }) else { return fallback(FallbackCode.busy) }
-        let enqueued = DispatchTime.now().uptimeNanoseconds
+        var pending = Pending(inv: inv, reference: reference, start: start, enqueued: start,
+                              deadlineNs: deadlineNs, slot: nil, immediate: nil)
+        if let code = gate(inv) { pending.immediate = code; return pending }
+        if deadlineNs == 0 { pending.immediate = budgetLimited ? FallbackCode.budget : FallbackCode.deadline; return pending }
+        guard let slot = slots.first(where: { $0.acquire() }) else { pending.immediate = FallbackCode.busy; return pending }
+        pending.slot = slot
+        pending.enqueued = DispatchTime.now().uptimeNanoseconds
         let module = self.module
         worker.async {
             slot.workerStarted()
             slot.complete(module.evaluate(inv))
         }
-        // Poll only within the short budget; timed semaphore wakeups overshoot under GPU load.
-        // Yield between polls: concurrent waiters on a few cores must not starve the workers they wait for.
-        var staged: StagedResult?
-        while true {
-            if slot.done.wait(timeout: .now()) == .success { staged = slot.take(); break }
-            if DispatchTime.now().uptimeNanoseconds - start >= deadlineNs { staged = slot.take(); break }
-            sched_yield()
+        return pending
+    }
+
+    /// Returns the outcome once it is decided (result in, deadline passed, or rejected up front), else nil.
+    func poll(_ p: Pending) -> ModuleOutcome? {
+        func fallback(_ code: UInt32, queueWait: UInt64 = 0) -> ModuleOutcome {
+            let ns = DispatchTime.now().uptimeNanoseconds - p.start
+            telemetry.recordFallback(code, attemptNs: ns)
+            return ModuleOutcome(committed: p.reference, accepted: false, code: code, attemptNs: ns, queueWaitNs: queueWait)
         }
-        let wait = slot.lastWorkerStartNs > enqueued ? slot.lastWorkerStartNs - enqueued : 0
-        let elapsed = DispatchTime.now().uptimeNanoseconds - start
-        guard let candidate = staged, elapsed < deadlineNs else { return fallback(FallbackCode.deadline, queueWait: wait) }
-        let status = ModuleEnvelope.validate(descriptor, inv, candidate)
+        if let code = p.immediate { return fallback(code) }
+        guard let slot = p.slot else { return fallback(FallbackCode.busy) }
+        var staged: StagedResult?
+        if slot.done.wait(timeout: .now()) == .success {
+            staged = slot.take()
+        } else if DispatchTime.now().uptimeNanoseconds - p.start >= p.deadlineNs {
+            staged = slot.take()     // abandons the slot unless the result just landed
+        } else {
+            return nil
+        }
+        let wait = slot.lastWorkerStartNs > p.enqueued ? slot.lastWorkerStartNs - p.enqueued : 0
+        let elapsed = DispatchTime.now().uptimeNanoseconds - p.start
+        guard let candidate = staged, elapsed < p.deadlineNs else { return fallback(FallbackCode.deadline, queueWait: wait) }
+        let status = ModuleEnvelope.validate(descriptor, p.inv, candidate)
         guard status == UInt32(HM_MODULE_EXACT) else { return fallback(status, queueWait: wait) }
-        guard candidate == reference else { return fallback(UInt32(HM_MODULE_PARITY_MISMATCH), queueWait: wait) }
-        let ns = DispatchTime.now().uptimeNanoseconds - start
+        guard candidate == p.reference else { return fallback(UInt32(HM_MODULE_PARITY_MISMATCH), queueWait: wait) }
+        let ns = DispatchTime.now().uptimeNanoseconds - p.start
         telemetry.recordAccepted(attemptNs: ns, queueWaitNs: wait)
         return ModuleOutcome(committed: candidate, accepted: true, code: 0, attemptNs: ns, queueWaitNs: wait)
+    }
+
+    /// Blocking convenience for a single module. Yields between polls so waiters never starve workers.
+    func run(_ inv: ModuleInvocation, deadlineNs: UInt64, budgetLimited: Bool = false) -> ModuleOutcome {
+        let pending = begin(inv, deadlineNs: deadlineNs, budgetLimited: budgetLimited)
+        while true {
+            if let outcome = poll(pending) { return outcome }
+            sched_yield()
+        }
     }
 
     var busySlots: Int { slots.filter { $0.isBusy }.count }

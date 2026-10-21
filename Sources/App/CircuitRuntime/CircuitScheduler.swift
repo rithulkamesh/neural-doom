@@ -70,20 +70,21 @@ final class CircuitScheduler {
         guard !group.isEmpty else { return }
         do {
             let start = DispatchTime.now().uptimeNanoseconds
-            var outcomes = [ModuleOutcome?](repeating: nil, count: group.count)
-            let lock = NSLock()
-            let dispatch = DispatchGroup()
-            for (i, runtime) in group.enumerated() {
+            // Start every module, then poll them all from this one thread: the wait is the slowest
+            // module, and no waiter thread can starve a worker on a few-core machine.
+            let pendings = group.map { runtime -> CircuitModuleRuntime.Pending in
                 let allowed = min(runtime.descriptor.deadlineNs, remainingNs)
-                let inv = invocation(runtime.descriptor)
-                dispatch.enter()
-                DispatchQueue.global(qos: .userInteractive).async {
-                    let outcome = runtime.run(inv, deadlineNs: allowed, budgetLimited: allowed < runtime.descriptor.deadlineNs)
-                    lock.lock(); outcomes[i] = outcome; lock.unlock()
-                    dispatch.leave()
-                }
+                return runtime.begin(invocation(runtime.descriptor), deadlineNs: allowed,
+                                     budgetLimited: allowed < runtime.descriptor.deadlineNs)
             }
-            dispatch.wait()
+            var outcomes = [ModuleOutcome?](repeating: nil, count: group.count)
+            var unresolved = group.count
+            while unresolved > 0 {
+                for (i, runtime) in group.enumerated() where outcomes[i] == nil {
+                    if let outcome = runtime.poll(pendings[i]) { outcomes[i] = outcome; unresolved -= 1 }
+                }
+                if unresolved > 0 { sched_yield() }
+            }
             // Commit in module-ID order within the phase, whatever finished first.
             for (i, runtime) in group.enumerated() {
                 let begin = DispatchTime.now().uptimeNanoseconds
