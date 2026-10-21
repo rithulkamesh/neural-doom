@@ -10,6 +10,7 @@ final class EngineCoordinator {
     let circuit: CircuitRuntime
     let remainder: RemainderRuntime
     let scheduler: CircuitScheduler
+    let ledger = CommitLedger()
     let locomotionModule: LegacyCommandModule
     let remainderModule: LegacyCommandModule
     let presentationQueue: MTLCommandQueue
@@ -39,9 +40,11 @@ final class EngineCoordinator {
         remainderModule = LegacyCommandModule(id: UInt32(HM_MODULE_TIC_REMAINDER), name: "tic.remainder",
                                               requiredOutputs: 21, inputCells: 55, stateCells: 55,
                                               sourceHash: hash(remainder.graph.manifestJSON()))
-        scheduler = CircuitScheduler(modules: [], legacy: [locomotionModule.asLegacy, remainderModule.asLegacy]) { _, _, _ in }
+        scheduler = CircuitScheduler(modules: GeneratedModuleRegistry.factories.map { $0() },
+                                     legacy: [locomotionModule.asLegacy, remainderModule.asLegacy], sink: ledger.sink)
         locomotionModule.scheduler = scheduler
         remainderModule.scheduler = scheduler
+        PhaseSeamBridge.install(scheduler)
         circuit.visualizationEnabled = ProcessInfo.processInfo.environment["HANDWIRED_DOOM_VISUALIZE"] == "1"
         remainder.visualizationEnabled = circuit.visualizationEnabled
         presentationQueue = device.makeCommandQueue()!
@@ -156,7 +159,6 @@ final class EngineCoordinator {
         }
         let before = DispatchTime.now().uptimeNanoseconds
         ticCounter += 1
-        scheduler.beginTic(ticCounter)
         injectMouse()
         HM_EngineFrame()
         let elapsed = DispatchTime.now().uptimeNanoseconds - before

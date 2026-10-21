@@ -214,25 +214,35 @@ func runLegacyThroughSchedulerTests(circuit: CircuitRuntime, remainder: Remainde
                                      budget: TicBudget(totalNs: 10_000_000_000)) { _, _, _ in }
     locomotion.scheduler = scheduler; rem.scheduler = scheduler
     var generator = Generator()
-    var mismatches = 0
+    var mismatches = 0, remainderMismatches = 0
     for i in 0..<snapshots {
         scheduler.beginTic(UInt64(i + 1))
-        let input = generator.snapshot()
-        var copy = input
+        let movement = generator.snapshot()
+        var copy = movement
         let reference = HM_TestOriginalMovement(&copy)
-        let direct = circuit.evaluate(input, reference: reference)
-        let scheduled = locomotion.run(setDeadline: { circuit.deadlineNs = $0 },
-                                       call: { circuit.evaluate(input, reference: reference) },
-                                       lastFallback: { circuit.lastFallback })
-        if (direct == nil) != (scheduled == nil) || (direct.map { !same($0, scheduled!) } ?? false) { mismatches += 1 }
-        _ = rem.run(setDeadline: { remainder.deadlineNs = $0 }, call: { () -> HMTicRemainderOutput? in nil },
-                    lastFallback: { "domain" })
+        let scheduledMove = locomotion.run(setDeadline: { circuit.deadlineNs = $0 },
+                                           call: { circuit.evaluate(movement, reference: reference) },
+                                           lastFallback: { circuit.lastFallback })
+        if scheduledMove.map({ !same($0, reference) }) ?? true { mismatches += 1 }
+        // The full-command remainder runs through the same scheduler against the original C oracle.
+        var before = generator.remainderSnapshot(movement)
+        var captured = HMTicRemainderInput()
+        var movementCopy = movement
+        let original = HM_TestOriginalRemainder(&movementCopy, &before, &captured)
+        let scheduledRemainder = rem.run(setDeadline: { remainder.deadlineNs = $0 },
+                                         call: { remainder.evaluate(captured, reference: original) },
+                                         lastFallback: { remainder.lastFallback })
+        if scheduledRemainder.map({ RemainderRuntime.cells($0) != RemainderRuntime.cells(original) }) ?? true {
+            remainderMismatches += 1
+        }
     }
     circuit.deadlineNs = 1_000_000_000; remainder.deadlineNs = 1_000_000_000
     let rows = scheduler.snapshots()
-    require(mismatches == 0, "scheduled locomotion differed from direct evaluation")
+    require(mismatches == 0, "scheduled locomotion differed from the original C oracle")
+    require(remainderMismatches == 0, "scheduled remainder differed from the original C oracle")
     require(rows.count == 2 && rows[0].name == "tic.locomotion" && rows[1].name == "tic.remainder"
-            && rows[0].attempts == snapshots && scheduler.orderViolations == 0,
+            && rows[0].attempts == snapshots && rows[1].attempts == snapshots && rows[1].circuitTics == snapshots
+            && rows[0].circuitTics == snapshots && scheduler.orderViolations == 0,
             "legacy rows / tic-command order")
     // Reversed call order is reported, and an exhausted whole-tic budget stops waiting.
     scheduler.beginTic(0)
@@ -241,5 +251,5 @@ func runLegacyThroughSchedulerTests(circuit: CircuitRuntime, remainder: Remainde
     scheduler.beginTic(1)
     scheduler.legacyFinished(elapsedNs: scheduler.budget.totalNs)
     require(scheduler.legacyDeadline(for: locomotion.descriptor) == 0, "exhausted budget still allowed a wait")
-    print("scheduler: \(snapshots) locomotion snapshots identical through the generic scheduler; generic rows and tic-command order verified")
+    print("scheduler: \(snapshots) locomotion and \(snapshots) full-command remainder snapshots identical to the original C oracle through the generic scheduler; generic rows and tic-command order verified")
 }

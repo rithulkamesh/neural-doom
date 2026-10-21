@@ -32,6 +32,8 @@ During migration, each module ledger entry is one of `reference-C`, `dual-run`, 
 
 **Phase seams.** `Sources/Bridge/PhaseSeamABI.h` (version 1) defines `HM_PhaseSeam(phase, edge)`. The reference code calls it before and after tic commands (`g_game.c`), player movement/collision and interactions/combat (`p_user.c`), thinkers and world commit (`p_tick.c`), HUD/automap (`g_game.c`), and BSP traversal and rasterization (`r_main.c`). A seam reads and writes no game state, so with no hook installed the original call order is unchanged; a fixed 330-tic Freedoom script hashes identically (C state, RNG indices, framebuffer) with seams hooked and unhooked.
 
+**Production route.** `EngineCoordinator` instantiates every `GeneratedModuleRegistry` factory and installs `PhaseSeamBridge`. The tic-commands seam opens a tic (budget and order reset); the end seam of each phase runs that phase's generic modules, each with its own `invocation(ticID:)` snapshot, then stages, validates, and commits them in order into a bounded `CommitLedger` (the stand-in for the future world-state store). `Sources/Circuits/Noop` is a directory-only module that proves this route: it runs once per tic at world commit, appears as an inspector row, and leaves the 330-tic state hash unchanged. Retire it when a real module takes its ID.
+
 **Discovery.** A module adds `Sources/Circuits/<module>/module.json` (`{"type": "<CircuitModule class>"}`) plus its sources. `Tools/generate_project.py` adds them to both targets and regenerates `GeneratedRegistry.swift` deterministically; `--check` fails when the committed file is stale and the test runner runs it.
 
 ## WAD-to-circuit memory and capacity policy

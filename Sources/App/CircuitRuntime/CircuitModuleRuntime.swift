@@ -62,6 +62,12 @@ protocol CircuitModule: AnyObject {
     func reference(_ invocation: ModuleInvocation) -> StagedResult
     /// The circuit candidate; runs on a worker and may be late.
     func evaluate(_ invocation: ModuleInvocation) -> StagedResult
+    /// Immutable snapshot `S_n` for this tic, built through the module's versioned boundary.
+    func invocation(ticID: UInt64) -> ModuleInvocation
+}
+
+extension CircuitModule {
+    func invocation(ticID: UInt64) -> ModuleInvocation { ModuleInvocation(ticID: ticID, inputs: [], state: []) }
 }
 
 // Pseudo-statuses sit above the HMModuleStatus range and never reach an ABI field.

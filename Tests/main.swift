@@ -398,5 +398,5 @@ for _ in 0..<1000 {
             "remainder visualization-on/off invariant")
     remainderVizChecks += 1
 }
-runLegacyThroughSchedulerTests(circuit: circuit, remainder: remainder, snapshots: min(total, 1000))
+runLegacyThroughSchedulerTests(circuit: circuit, remainder: remainder, snapshots: total)
 print("remainder adversarial: \(adversarialChecks) stateful/edge snapshots; invalid-domain, Metal/deadline fallback, ring 1000/128/872, visualization \(remainderVizChecks) invariant checks + 24 live tics / 2 traces")

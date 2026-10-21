@@ -39,7 +39,7 @@ int HM_TestSeamScript(const char *iwad, int hooked, int tics,
                       uint32_t *phases_seen, uint32_t *violation_count, uint32_t *seam_total) {
     if (!HM_TestBootEngine(iwad, "E1M1")) return 1;
     HM_ResetPhaseSeams();
-    if (hooked) HM_SetPhaseSeamHook(recording_hook);
+    if (hooked == 1) HM_SetPhaseSeamHook(recording_hook);   // 2 = leave an externally installed hook alone
     uint64_t h = 14695981039346656037ull;
     int guard = 0, start = gametic;
     while (gametic - start < tics && guard++ < tics * 8) {
@@ -61,7 +61,7 @@ int HM_TestSeamScript(const char *iwad, int hooked, int tics,
         h = fnv(h, cells, sizeof cells);
         h = fnv(h, DG_ScreenBuffer, (size_t)DOOMGENERIC_RESX * DOOMGENERIC_RESY * sizeof(*DG_ScreenBuffer));
     }
-    HM_SetPhaseSeamHook(0);
+    if (hooked == 1) HM_SetPhaseSeamHook(0);
     *state_hash = h; *seam_sequence_hash = seam_hash;
     uint32_t seen = 0;
     for (int i = 0; i < HM_PHASE_COUNT; ++i) if (phase_count[i]) seen |= 1u << i;

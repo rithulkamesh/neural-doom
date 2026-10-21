@@ -56,12 +56,19 @@ final class CircuitScheduler {
     /// Runs every generic module for one tic. `invocation` supplies each module's
     /// immutable snapshot; modules never see each other's uncommitted output.
     func runTic(ticID: UInt64, invocation: (CircuitModuleDescriptor) -> ModuleInvocation) {
-        self.ticID = ticID
-        remainingNs = budget.totalNs
-        commitOrder = []
-        let phases = Dictionary(grouping: runtimes, by: { $0.descriptor.phase })
-        for phase in phases.keys.sorted() {
-            let group = phases[phase]!.sorted { $0.descriptor.id < $1.descriptor.id }
+        beginTic(ticID)
+        for phase in Set(runtimes.map { $0.descriptor.phase }).sorted() { runPhase(phase, invocation: invocation) }
+    }
+
+    /// Runs the generic modules of one phase, using each module's own snapshot builder.
+    func runPhase(_ phase: UInt32) {
+        runPhase(phase) { d in self.runtime(for: d.id)!.module.invocation(ticID: self.ticID) }
+    }
+
+    func runPhase(_ phase: UInt32, invocation: (CircuitModuleDescriptor) -> ModuleInvocation) {
+        let group = runtimes.filter { $0.descriptor.phase == phase }.sorted { $0.descriptor.id < $1.descriptor.id }
+        guard !group.isEmpty else { return }
+        do {
             let start = DispatchTime.now().uptimeNanoseconds
             var outcomes = [ModuleOutcome?](repeating: nil, count: group.count)
             let lock = NSLock()
@@ -101,6 +108,7 @@ final class CircuitScheduler {
         ticID = id
         remainingNs = budget.totalNs
         legacyOrder = []
+        commitOrder = []
     }
 
     /// The deadline a legacy module may use for this call under the whole-tic
