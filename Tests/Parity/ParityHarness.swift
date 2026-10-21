@@ -55,7 +55,7 @@ func parityCaseSeed(_ index: Int) -> UInt64 {
 
 // MARK: - Exact-program evaluators (CPU + Metal) shared by exact modules
 
-final class Arena {
+final class ParityArena {
     private var frees: [() -> Void] = []
     func make<T>(_ values: [T], minimum: Int = 1) -> UnsafeMutablePointer<T> {
         let n = max(minimum, values.count)
@@ -76,13 +76,13 @@ struct ExactProgramSpec {
 
     init(inputCount: Int, operations: [HMExactOpV1], roots: [UInt32]) {
         self.inputCount = inputCount; self.operations = operations; self.roots = roots
-        let arena = Arena()
+        let arena = ParityArena()
         var program = ExactProgramSpec.program(inputCount, operations, roots, arena, hash: 0)
         hash = HM_ExactProgramHashV1(&program)
     }
 
     static func program(_ inputCount: Int, _ ops: [HMExactOpV1], _ roots: [UInt32],
-                        _ arena: Arena, hash: UInt64) -> HMExactProgramV1 {
+                        _ arena: ParityArena, hash: UInt64) -> HMExactProgramV1 {
         HMExactProgramV1(abi_version: UInt32(HM_EXACT_PROGRAM_ABI_VERSION),
                          integer_encoding: UInt32(HM_EXACT_INTEGER_ENCODING_V1),
                          input_count: UInt32(inputCount), register_count: UInt32(inputCount + ops.count),
@@ -99,7 +99,7 @@ struct ExactProgramSpec {
     }
 
     func evaluateCPU(inputs: [Int32], tables: [ParityTable]) -> RawResult {
-        let arena = Arena()
+        let arena = ParityArena()
         var program = ExactProgramSpec.program(inputCount, operations, roots, arena, hash: hash)
         let words = inputs.map { UInt32(bitPattern: $0) }
         let views = tables.map {
@@ -225,7 +225,7 @@ private func fromC(_ c: HMModuleEventV1) -> ParityEvent {
 func finalizeParity(_ m: ParityModule, _ c: ParityCase, _ raw: RawResult, tamper: Tamper = .none) -> ParityResult {
     func rejected(_ s: UInt32) -> ParityResult { ParityResult(status: s) }
     guard raw.status == UInt32(HM_MODULE_EXACT) else { return rejected(raw.status) }
-    let arena = Arena()
+    let arena = ParityArena()
     let tables = c.tables.map {
         HMTableViewV1(table_id: $0.id, length: UInt32($0.cells.count), capacity: $0.capacity,
                       reserved: 0, cells: UnsafePointer(arena.make($0.cells)))
