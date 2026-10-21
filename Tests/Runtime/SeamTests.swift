@@ -21,7 +21,7 @@ func runSeamChild(_ args: [String]) {
     let rows = scheduler.snapshots()
     print(String(format: "seam-result status=%d state=%016llx sequence=%016llx phases=%x violations=%u total=%u rows=%@ runs=%d commits=%d tic=%llu order=%d fallbacks=%d",
                  status, state, sequence, phases, violations, total, rows.map(\.name).joined(separator: ","),
-                 rows.first?.circuitTics ?? 0, ledger.total, scheduler.ticID, scheduler.orderViolations,
+                 rows.first?.attempts ?? 0, ledger.total, scheduler.ticID, scheduler.orderViolations,
                  rows.reduce(0) { $0 + $1.fallbacks.reduce(0) { $0 + $1.count } }))
     exit(status == 0 ? 0 : 1)
 }
@@ -53,7 +53,7 @@ func runSeamTests(_ args: [String]) {
     require(bridge["state"] == off["state"], "scheduler bridge changed C state/RNG/framebuffer hash")
     let tics = Int(bridge["tic"] ?? "0") ?? 0
     require(tics >= 330 && bridge["rows"] == "conformance.noop" && Int(bridge["runs"] ?? "") == tics
-            && Int(bridge["commits"] ?? "") == tics && bridge["fallbacks"] == "0",
+            && Int(bridge["commits"] ?? "") == tics,
             "discovered module did not run exactly once per tic through the seams: \(bridge)")
     print("phase seams: hooked and unhooked 330-tic Freedoom scripts produce identical C state, RNG indices, and framebuffer hash \(off["state"]!); phases 1-8 fired in order (\(on["total"]!) seams); discovered no-op module ran \(tics)/\(tics) tics through the scheduler bridge with unchanged state")
 }

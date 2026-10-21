@@ -15,7 +15,9 @@ private final class FakeModule: CircuitModule {
     var delayNs: UInt64 = 0
     private let lock = NSLock()
     private var calls = 0
+    private var started: UInt64 = 0, ended: UInt64 = 0
     var evaluateCalls: Int { lock.lock(); defer { lock.unlock() }; return calls }
+    var window: (start: UInt64, end: UInt64) { lock.lock(); defer { lock.unlock() }; return (started, ended) }
 
     init(id: UInt32, phase: UInt32, deadlineNs: UInt64 = 50_000_000, slots: Int = 8) {
         descriptor = CircuitModuleDescriptor(
@@ -37,7 +39,8 @@ private final class FakeModule: CircuitModule {
     }
 
     func evaluate(_ inv: ModuleInvocation) -> StagedResult {
-        lock.lock(); calls += 1; lock.unlock()
+        lock.lock(); calls += 1; started = DispatchTime.now().uptimeNanoseconds; lock.unlock()
+        defer { lock.lock(); ended = DispatchTime.now().uptimeNanoseconds; lock.unlock() }
         if delayNs > 0 { Thread.sleep(forTimeInterval: Double(delayNs) / 1e9) }
         var r = reference(inv)
         switch behavior {
@@ -93,16 +96,16 @@ func runSchedulerTests() {
     }
     // Late work: timeout falls back, the late result is never committed, the next tic is unaffected.
     do {
-        let m = FakeModule(id: UInt32(HM_MODULE_MOVEMENT_COLLISION), phase: phase, deadlineNs: 2_000_000)
-        m.delayNs = 40_000_000
+        let m = FakeModule(id: UInt32(HM_MODULE_MOVEMENT_COLLISION), phase: phase, deadlineNs: 25_000_000)
+        m.delayNs = 300_000_000
         let log = CommitLog()
-        let scheduler = CircuitScheduler(modules: [m], sink: log.sink)
+        let scheduler = CircuitScheduler(modules: [m], budget: TicBudget(totalNs: 2_000_000_000), sink: log.sink)
         scheduler.runTic(ticID: 1, invocation: { _ in invocation(1) })
         m.delayNs = 0
         scheduler.runTic(ticID: 2, invocation: { _ in invocation(2) })
         require(log.entries[0].result == m.reference(invocation(1)) && log.entries[1].result == m.reference(invocation(2)),
                 "late slot: tic results crossed")
-        Thread.sleep(forTimeInterval: 0.1)
+        Thread.sleep(forTimeInterval: 0.5)
         require(log.entries.count == 2, "late completion committed after its tic")
         require(m.descriptor.slotCount == 8 && scheduler.runtime(for: m.descriptor.id)!.busySlots == 0, "late slot never released")
         let t = scheduler.telemetry(for: m.descriptor.id)!
@@ -110,15 +113,15 @@ func runSchedulerTests() {
     }
     // All slots owned by late workers: the next tic falls back with slots-busy, never overwrites.
     do {
-        let m = FakeModule(id: UInt32(HM_MODULE_MOVEMENT_COLLISION), phase: phase, deadlineNs: 1_000_000, slots: 2)
-        m.delayNs = 80_000_000
+        let m = FakeModule(id: UInt32(HM_MODULE_MOVEMENT_COLLISION), phase: phase, deadlineNs: 20_000_000, slots: 2)
+        m.delayNs = 400_000_000
         let log = CommitLog()
-        let scheduler = CircuitScheduler(modules: [m], sink: log.sink)
+        let scheduler = CircuitScheduler(modules: [m], budget: TicBudget(totalNs: 2_000_000_000), sink: log.sink)
         for tic in 1...3 { scheduler.runTic(ticID: UInt64(tic), invocation: { _ in invocation(UInt64(tic)) }) }
         let t = scheduler.telemetry(for: m.descriptor.id)!
         require(t.fallbackCounts == [FallbackCode.deadline: 2, FallbackCode.busy: 1], "slot exhaustion: \(t.fallbackCounts)")
         require(log.entries.allSatisfy { $0.result == m.reference(invocation($0.tic)) }, "slot exhaustion committed a candidate")
-        Thread.sleep(forTimeInterval: 0.2)
+        Thread.sleep(forTimeInterval: 0.8)
         m.delayNs = 0
         scheduler.runTic(ticID: 4, invocation: { _ in invocation(4) })
         require(t.circuitTics == 1, "slots were not reusable after late workers finished")
@@ -156,22 +159,23 @@ func runSchedulerTests() {
 
     // Phases run concurrently: N modules of 6 ms in one phase cost about 6 ms, not N x 6 ms.
     do {
-        let mods = (0..<4).map { FakeModule(id: UInt32(HM_MODULE_MOVEMENT_COLLISION) + UInt32($0) * 0x10000, phase: 2) }
-        mods.forEach { $0.delayNs = 6_000_000 }
+        let mods = (0..<4).map { FakeModule(id: UInt32(HM_MODULE_MOVEMENT_COLLISION) + UInt32($0) * 0x10000, phase: 2, deadlineNs: 1_000_000_000) }
         let log = CommitLog()
-        let scheduler = CircuitScheduler(modules: mods, budget: TicBudget(totalNs: 200_000_000), sink: log.sink)
-        let begin = DispatchTime.now().uptimeNanoseconds
+        mods.forEach { $0.delayNs = 60_000_000 }
+        let scheduler = CircuitScheduler(modules: mods, budget: TicBudget(totalNs: 2_000_000_000), sink: log.sink)
         scheduler.runTic(ticID: 1, invocation: { _ in invocation(1) })
-        let elapsed = DispatchTime.now().uptimeNanoseconds - begin
-        require(elapsed < 20_000_000 && mods.allSatisfy { scheduler.telemetry(for: $0.descriptor.id)!.circuitTics == 1 },
-                "same-phase modules were serialized (\(elapsed) ns)")
+        // Structural, not wall-clock: every module started before any module finished.
+        let windows = mods.map(\.window)
+        require(windows.map(\.start).max()! < windows.map(\.end).min()!
+                && mods.allSatisfy { scheduler.telemetry(for: $0.descriptor.id)!.circuitTics == 1 },
+                "same-phase modules were serialized")
     }
 
     // Telemetry: high-water marks, latency, queue wait, commit time, bounded sampled traces.
     do {
         let m = FakeModule(id: UInt32(HM_MODULE_MOVEMENT_COLLISION), phase: phase)
         let log = CommitLog()
-        let scheduler = CircuitScheduler(modules: [m], sink: log.sink)
+        let scheduler = CircuitScheduler(modules: [m], budget: TicBudget(totalNs: 2_000_000_000), sink: log.sink)
         for tic in 1...64 { scheduler.runTic(ticID: UInt64(tic), invocation: { _ in invocation(UInt64(tic)) }) }
         let t = scheduler.telemetry(for: m.descriptor.id)!
         require(t.circuitTics == 64 && t.fallbackCounts.isEmpty, "valid candidates were not accepted")
